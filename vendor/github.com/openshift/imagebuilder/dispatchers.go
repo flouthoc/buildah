@@ -216,6 +216,20 @@ func from(b *Builder, args []string, attributes map[string]bool, flagArgs []stri
 		return fmt.Errorf("FROM requires either one argument, or three: FROM <source> [as <name>]")
 	}
 
+	fromArgs := mergeEnv(envMapAsSlice(builtinBuildArgs), mergeEnv(envMapAsSlice(b.Args), b.Env))
+	for _, a := range flagArgs {
+		arg, err := ProcessWord(a, fromArgs)
+		if err != nil {
+			return err
+		}
+		switch {
+		case strings.HasPrefix(arg, "--platform="):
+			b.Args["TARGETPLATFORM"] = strings.TrimPrefix(arg, "--platform=")
+		default:
+			return fmt.Errorf("FROM only supports the --platform=<platform> flag")
+		}
+	}
+
 	name := args[0]
 
 	// Support ARG before from
@@ -235,6 +249,7 @@ func from(b *Builder, args []string, attributes map[string]bool, flagArgs []stri
 		}
 	}
 	b.RunConfig.Image = name
+
 	// TODO: handle onbuild
 	return nil
 }

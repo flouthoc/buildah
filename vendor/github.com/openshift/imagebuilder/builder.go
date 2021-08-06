@@ -346,6 +346,7 @@ func (b *Builder) Step() *Step {
 // optimization hint that allows the builder to avoid performing
 // unnecessary work.
 func (b *Builder) Run(step *Step, exec Executor, noRunsRemaining bool) error {
+
 	fn, ok := evaluateTable[step.Command]
 	if !ok {
 		return exec.UnrecognizedInstruction(step)
