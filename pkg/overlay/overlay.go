@@ -142,6 +142,8 @@ func mountHelper(contentDir, source, dest string, _, _ int, graphOptions []strin
 			mount.Type = "bind"
 			mount.Options = []string{"bind", "slave"}
 			return mount, nil
+		} else {
+			overlayOptions = fmt.Sprintf("%s,userxattr", overlayOptions)
 		}
 		/* If a mount_program is not specified, fallback to try mount native overlay.  */
 	}
