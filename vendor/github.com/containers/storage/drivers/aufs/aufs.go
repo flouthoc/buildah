@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 /*
@@ -26,6 +27,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -649,11 +651,11 @@ func (a *Driver) mounted(mountpoint string) (bool, error) {
 // Cleanup aufs and unmount all mountpoints
 func (a *Driver) Cleanup() error {
 	var dirs []string
-	if err := filepath.Walk(a.mntPath(), func(path string, info os.FileInfo, err error) error {
+	if err := filepath.WalkDir(a.mntPath(), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() {
+		if !d.IsDir() {
 			return nil
 		}
 		dirs = append(dirs, path)
@@ -730,14 +732,14 @@ func useDirperm() bool {
 	enableDirpermLock.Do(func() {
 		base, err := ioutil.TempDir("", "storage-aufs-base")
 		if err != nil {
-			logrus.Errorf("error checking dirperm1: %v", err)
+			logrus.Errorf("Checking dirperm1: %v", err)
 			return
 		}
 		defer os.RemoveAll(base)
 
 		union, err := ioutil.TempDir("", "storage-aufs-union")
 		if err != nil {
-			logrus.Errorf("error checking dirperm1: %v", err)
+			logrus.Errorf("Checking dirperm1: %v", err)
 			return
 		}
 		defer os.RemoveAll(union)
@@ -748,7 +750,7 @@ func useDirperm() bool {
 		}
 		enableDirperm = true
 		if err := Unmount(union); err != nil {
-			logrus.Errorf("error checking dirperm1: failed to unmount %v", err)
+			logrus.Errorf("Checking dirperm1: failed to unmount %v", err)
 		}
 	})
 	return enableDirperm
