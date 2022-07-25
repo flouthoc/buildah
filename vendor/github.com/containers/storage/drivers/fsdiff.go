@@ -2,6 +2,8 @@ package graphdriver
 
 import (
 	"io"
+	"os"
+	"runtime"
 	"time"
 
 	"github.com/containers/storage/pkg/archive"
@@ -138,6 +140,7 @@ func (gdw *NaiveDiffDriver) Changes(id string, idMappings *idtools.IDMappings, p
 	if parent != "" {
 		options := MountOpts{
 			MountLabel: mountLabel,
+			Options:    []string{"ro"},
 		}
 		parentFs, err = driver.Get(parent, options)
 		if err != nil {
@@ -169,9 +172,16 @@ func (gdw *NaiveDiffDriver) ApplyDiff(id, parent string, options ApplyDiffOpts) 
 	}
 	defer driver.Put(id)
 
+	defaultForceMask := os.FileMode(0700)
+	var forceMask *os.FileMode = nil
+	if runtime.GOOS == "darwin" {
+		forceMask = &defaultForceMask
+	}
+
 	tarOptions := &archive.TarOptions{
 		InUserNS:          userns.RunningInUserNS(),
 		IgnoreChownErrors: options.IgnoreChownErrors,
+		ForceMask:         forceMask,
 	}
 	if options.Mappings != nil {
 		tarOptions.UIDMaps = options.Mappings.UIDs()
@@ -180,7 +190,7 @@ func (gdw *NaiveDiffDriver) ApplyDiff(id, parent string, options ApplyDiffOpts) 
 	start := time.Now().UTC()
 	logrus.Debug("Start untar layer")
 	if size, err = ApplyUncompressedLayer(layerFs, options.Diff, tarOptions); err != nil {
-		logrus.Errorf("Error while applying layer: %s", err)
+		logrus.Errorf("While applying layer: %s", err)
 		return
 	}
 	logrus.Debugf("Untar time: %vs", time.Now().UTC().Sub(start).Seconds())
