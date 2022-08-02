@@ -124,12 +124,7 @@ func TempDirForURL(dir, prefix, url string) (name string, subdir string, err err
 			}
 			return "", "", errors.Wrapf(err, "cloning %q to %q:\n%s", url, name, string(combinedOutput))
 		}
-		// Check if git url specifies any subdir
-		// if subdir is there switch to subdir.
-		if gitSubDir != "" {
-			name = filepath.Join(name, gitSubDir)
-		}
-		return name, "", nil
+		return name, gitSubDir, nil
 	}
 	if strings.HasPrefix(url, "github.com/") {
 		ghurl := url
