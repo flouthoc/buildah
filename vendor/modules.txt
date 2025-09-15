@@ -385,7 +385,7 @@ github.com/smallstep/pkcs7/internal/legacy/x509
 # github.com/spf13/cobra v1.10.1
 ## explicit; go 1.15
 github.com/spf13/cobra
-# github.com/spf13/pflag v1.0.9
+# github.com/spf13/pflag v1.0.10
 ## explicit; go 1.12
 github.com/spf13/pflag
 # github.com/stefanberger/go-pkcs11uri v0.0.0-20230803200340-78284954bff6
@@ -429,8 +429,6 @@ github.com/vishvananda/netlink/nl
 # github.com/vishvananda/netns v0.0.5
 ## explicit; go 1.17
 github.com/vishvananda/netns
-# github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb
-## explicit
 # go.etcd.io/bbolt v1.4.3
 ## explicit; go 1.23
 go.etcd.io/bbolt
@@ -471,7 +469,7 @@ go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
 go.opentelemetry.io/otel/trace/internal/telemetry
 go.opentelemetry.io/otel/trace/noop
-# go.podman.io/common v0.0.0-20250826054041-6e4bed3c9118
+# go.podman.io/common v0.0.0-20250826054041-6e4bed3c9118 => github.com/flouthoc/container-libs/common v0.0.0-20250915162154-c9a3aaf6a483
 ## explicit; go 1.23.3
 go.podman.io/common/internal
 go.podman.io/common/internal/attributedstring
@@ -525,7 +523,7 @@ go.podman.io/common/pkg/umask
 go.podman.io/common/pkg/util
 go.podman.io/common/pkg/version
 go.podman.io/common/version
-# go.podman.io/image/v5 v5.36.1-0.20250820085751-a13b38f45723
+# go.podman.io/image/v5 v5.37.0 => github.com/flouthoc/container-libs/image/v5 v5.0.0-20250915162154-c9a3aaf6a483
 ## explicit; go 1.23.3
 go.podman.io/image/v5/copy
 go.podman.io/image/v5/directory
@@ -582,6 +580,7 @@ go.podman.io/image/v5/pkg/tlsclientconfig
 go.podman.io/image/v5/sif
 go.podman.io/image/v5/signature
 go.podman.io/image/v5/signature/internal
+go.podman.io/image/v5/signature/internal/sequoia
 go.podman.io/image/v5/signature/signer
 go.podman.io/image/v5/signature/sigstore
 go.podman.io/image/v5/signature/sigstore/internal
@@ -592,7 +591,7 @@ go.podman.io/image/v5/transports
 go.podman.io/image/v5/transports/alltransports
 go.podman.io/image/v5/types
 go.podman.io/image/v5/version
-# go.podman.io/storage v1.59.1-0.20250820085751-a13b38f45723
+# go.podman.io/storage v1.60.0 => github.com/flouthoc/container-libs/storage v0.0.0-20250915162154-c9a3aaf6a483
 ## explicit; go 1.23.3
 go.podman.io/storage
 go.podman.io/storage/drivers
@@ -777,8 +776,8 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.36.6
-## explicit; go 1.22
+# google.golang.org/protobuf v1.36.8
+## explicit; go 1.23
 google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
@@ -834,3 +833,6 @@ tags.cncf.io/container-device-interface/pkg/parser
 # tags.cncf.io/container-device-interface/specs-go v1.0.0
 ## explicit; go 1.19
 tags.cncf.io/container-device-interface/specs-go
+# go.podman.io/common => github.com/flouthoc/container-libs/common v0.0.0-20250915162154-c9a3aaf6a483
+# go.podman.io/storage => github.com/flouthoc/container-libs/storage v0.0.0-20250915162154-c9a3aaf6a483
+# go.podman.io/image/v5 => github.com/flouthoc/container-libs/image/v5 v5.0.0-20250915162154-c9a3aaf6a483
