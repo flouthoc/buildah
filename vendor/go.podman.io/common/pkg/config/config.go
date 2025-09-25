@@ -761,9 +761,9 @@ func (c *Config) CheckCgroupsAndAdjustConfig() {
 			}
 		}
 	} else {
-		for part := range strings.SplitSeq(session, ",") {
-			if path, ok := strings.CutPrefix(part, "unix:path="); ok {
-				err := fileutils.Exists(path)
+		for _, part := range strings.Split(session, ",") {
+			if strings.HasPrefix(part, "unix:path=") {
+				err := fileutils.Exists(strings.TrimPrefix(part, "unix:path="))
 				hasSession = err == nil
 				break
 			}
@@ -1158,17 +1158,17 @@ func (c *Config) ImageCopyTmpDir() (string, error) {
 // setupEnv sets the environment variables for the engine.
 func (c *Config) setupEnv() error {
 	for _, env := range c.Engine.Env.Get() {
-		key, value, ok := strings.Cut(env, "=")
-		if !ok {
+		splitEnv := strings.SplitN(env, "=", 2)
+		if len(splitEnv) != 2 {
 			logrus.Warnf("invalid environment variable for engine %s, valid configuration is KEY=value pair", env)
 			continue
 		}
 		// skip if the env is already defined
-		if _, ok := os.LookupEnv(key); ok {
-			logrus.Debugf("environment variable %s is already defined, skip the settings from containers.conf", key)
+		if _, ok := os.LookupEnv(splitEnv[0]); ok {
+			logrus.Debugf("environment variable %s is already defined, skip the settings from containers.conf", splitEnv[0])
 			continue
 		}
-		if err := os.Setenv(key, value); err != nil {
+		if err := os.Setenv(splitEnv[0], splitEnv[1]); err != nil {
 			return err
 		}
 	}
@@ -1202,7 +1202,7 @@ func (e eventsLogMaxSize) MarshalText() ([]byte, error) {
 		v := []byte{}
 		return v, nil
 	}
-	return fmt.Appendf(nil, "%d", e), nil
+	return []byte(fmt.Sprintf("%d", e)), nil
 }
 
 func ValidateImageVolumeMode(mode string) error {

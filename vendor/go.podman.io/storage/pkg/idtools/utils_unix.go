@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 func resolveBinary(binname string) (string, error) {
@@ -25,7 +26,7 @@ func resolveBinary(binname string) (string, error) {
 	return "", fmt.Errorf("binary %q does not resolve to a binary of that name in $PATH (%q)", binname, resolvedPath)
 }
 
-func execCmd(cmd string, args ...string) ([]byte, error) {
-	execCmd := exec.Command(cmd, args...)
+func execCmd(cmd, args string) ([]byte, error) {
+	execCmd := exec.Command(cmd, strings.Split(args, " ")...)
 	return execCmd.CombinedOutput()
 }

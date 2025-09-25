@@ -2,7 +2,6 @@ package idtools
 
 import (
 	"fmt"
-	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -18,12 +17,19 @@ import (
 
 var (
 	once        sync.Once
-	userCommand []string // command, args…, to be finished by adding an user name
+	userCommand string
+
+	cmdTemplates = map[string]string{
+		"adduser": "--system --shell /bin/false --no-create-home --disabled-login --disabled-password --group %s",
+		"useradd": "-r -s /bin/false %s",
+		"usermod": "-%s %d-%d %s",
+	}
 
 	idOutRegexp = regexp.Delayed(`uid=([0-9]+).*gid=([0-9]+)`)
 	// default length for a UID/GID subordinate range
 	defaultRangeLen   = 65536
 	defaultRangeStart = 100000
+	userMod           = "usermod"
 )
 
 // AddNamespaceRangesUser takes a username and uses the standard system
@@ -66,16 +72,16 @@ func addUser(userName string) error {
 	once.Do(func() {
 		// set up which commands are used for adding users/groups dependent on distro
 		if _, err := resolveBinary("adduser"); err == nil {
-			userCommand = []string{"adduser", "--system", "--shell", "/bin/false", "--no-create-home", "--disabled-login", "--disabled-password", "--group"}
+			userCommand = "adduser"
 		} else if _, err := resolveBinary("useradd"); err == nil {
-			userCommand = []string{"useradd", "-r", "-s", "/bin/false"}
+			userCommand = "useradd"
 		}
 	})
-	if userCommand == nil {
+	if userCommand == "" {
 		return fmt.Errorf("cannot add user; no useradd/adduser binary found")
 	}
-	args := append(slices.Clone(userCommand), userName)
-	out, err := execCmd(args[0], args[1:]...)
+	args := fmt.Sprintf(cmdTemplates[userCommand], userName)
+	out, err := execCmd(userCommand, args)
 	if err != nil {
 		return fmt.Errorf("failed to add user with error: %w; output: %q", err, string(out))
 	}
@@ -95,7 +101,7 @@ func createSubordinateRanges(name string) error {
 		if err != nil {
 			return fmt.Errorf("can't find available subuid range: %w", err)
 		}
-		out, err := execCmd("usermod", "-v", fmt.Sprintf("%d-%d", startID, startID+defaultRangeLen-1), name)
+		out, err := execCmd(userMod, fmt.Sprintf(cmdTemplates[userMod], "v", startID, startID+defaultRangeLen-1, name))
 		if err != nil {
 			return fmt.Errorf("unable to add subuid range to user: %q; output: %s, err: %w", name, out, err)
 		}
@@ -111,7 +117,7 @@ func createSubordinateRanges(name string) error {
 		if err != nil {
 			return fmt.Errorf("can't find available subgid range: %w", err)
 		}
-		out, err := execCmd("usermod", "-w", fmt.Sprintf("%d-%d", startID, startID+defaultRangeLen-1), name)
+		out, err := execCmd(userMod, fmt.Sprintf(cmdTemplates[userMod], "w", startID, startID+defaultRangeLen-1, name))
 		if err != nil {
 			return fmt.Errorf("unable to add subgid range to user: %q; output: %s, err: %w", name, out, err)
 		}

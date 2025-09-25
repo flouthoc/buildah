@@ -40,17 +40,17 @@ func ImageConfigFromChanges(changes []string) (*ImageConfig, error) { // nolint:
 	for _, change := range changes {
 		// First, let's assume proper Dockerfile format - space
 		// separator between instruction and value
-		outerKey, value, ok := strings.Cut(change, " ")
+		split := strings.SplitN(change, " ", 2)
 
-		if !ok {
-			outerKey, value, ok = strings.Cut(change, "=")
-			if !ok {
+		if len(split) != 2 {
+			split = strings.SplitN(change, "=", 2)
+			if len(split) != 2 {
 				return nil, fmt.Errorf("invalid change %q - must be formatted as KEY VALUE", change)
 			}
 		}
 
-		outerKey = strings.ToUpper(strings.TrimSpace(outerKey))
-		value = strings.TrimSpace(value)
+		outerKey := strings.ToUpper(strings.TrimSpace(split[0]))
+		value := strings.TrimSpace(split[1])
 		switch outerKey {
 		case "USER":
 			// Assume literal contents are the user.
@@ -96,10 +96,17 @@ func ImageConfigFromChanges(changes []string) (*ImageConfig, error) { // nolint:
 			// For now: we only support key=value
 			// We will attempt to strip quotation marks if present.
 
-			key, val, _ := strings.Cut(value, "=") // val is "" if there is no "="
+			var key, val string
+
+			splitEnv := strings.SplitN(value, "=", 2)
+			key = splitEnv[0]
 			// We do need a key
 			if key == "" {
 				return nil, fmt.Errorf("invalid change %q - ENV must have at least one argument", change)
+			}
+			// Perfectly valid to not have a value
+			if len(splitEnv) == 2 {
+				val = splitEnv[1]
 			}
 
 			if strings.HasPrefix(key, `"`) && strings.HasSuffix(key, `"`) {
@@ -185,11 +192,17 @@ func ImageConfigFromChanges(changes []string) (*ImageConfig, error) { // nolint:
 			// Potentially problematic: LABEL might theoretically
 			// allow an = in the key? If people really do this, we
 			// may need to investigate more advanced parsing.
-			key, val, ok := strings.Cut(value, "=")
+			var (
+				key, val string
+			)
+
+			splitLabel := strings.SplitN(value, "=", 2)
 			// Unlike ENV, LABEL must have a value
-			if !ok {
+			if len(splitLabel) != 2 {
 				return nil, fmt.Errorf("invalid change %q - LABEL must be formatted key=value", change)
 			}
+			key = splitLabel[0]
+			val = splitLabel[1]
 
 			if strings.HasPrefix(key, `"`) && strings.HasSuffix(key, `"`) {
 				key = strings.TrimPrefix(strings.TrimSuffix(key, `"`), `"`)

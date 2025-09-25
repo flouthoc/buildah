@@ -33,7 +33,8 @@ func mount(device, target, mType string, flag uintptr, data string) error {
 	options := []string{"fspath", target}
 
 	if data != "" {
-		for x := range strings.SplitSeq(data, ",") {
+		xs := strings.Split(data, ",")
+		for _, x := range xs {
 			if x == "bind" {
 				isNullFS = true
 				continue

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -363,7 +362,7 @@ func getRootlessStorageOpts(systemOpts StoreOptions) (StoreOptions, error) {
 	}
 
 	if os.Getenv("STORAGE_OPTS") != "" {
-		opts.GraphDriverOptions = slices.AppendSeq(opts.GraphDriverOptions, strings.SplitSeq(os.Getenv("STORAGE_OPTS"), ","))
+		opts.GraphDriverOptions = append(opts.GraphDriverOptions, strings.Split(os.Getenv("STORAGE_OPTS"), ",")...)
 	}
 
 	return opts, nil

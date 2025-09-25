@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"maps"
 	"os"
 	"slices"
 	"strings"
@@ -239,7 +238,9 @@ func (l *list) SetAnnotations(instanceDigest *digest.Digest, annotations map[str
 	if *a == nil {
 		(*a) = make(map[string]string)
 	}
-	maps.Copy((*a), annotations)
+	for k, v := range annotations {
+		(*a)[k] = v
+	}
 	if len(*a) == 0 {
 		*a = nil
 	}
@@ -258,7 +259,9 @@ func (l *list) Annotations(instanceDigest *digest.Digest) (map[string]string, er
 		a = oci.Annotations
 	}
 	annotations := make(map[string]string)
-	maps.Copy(annotations, a)
+	for k, v := range a {
+		annotations[k] = v
+	}
 	return annotations, nil
 }
 

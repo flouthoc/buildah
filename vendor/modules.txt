@@ -464,8 +464,8 @@ go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
 go.opentelemetry.io/otel/trace/internal/telemetry
 go.opentelemetry.io/otel/trace/noop
-# go.podman.io/common v0.65.1-0.20250916163606-92222dcd3da4
-## explicit; go 1.24.2
+# go.podman.io/common v0.65.1-0.20250916163606-92222dcd3da4 => github.com/flouthoc/container-libs/common v0.0.0-20250925194119-a9e3e4c00d13
+## explicit; go 1.23.3
 go.podman.io/common/internal
 go.podman.io/common/internal/attributedstring
 go.podman.io/common/libimage
@@ -518,8 +518,8 @@ go.podman.io/common/pkg/umask
 go.podman.io/common/pkg/util
 go.podman.io/common/pkg/version
 go.podman.io/common/version
-# go.podman.io/image/v5 v5.37.1-0.20250916163606-92222dcd3da4
-## explicit; go 1.24.0
+# go.podman.io/image/v5 v5.37.1-0.20250916163606-92222dcd3da4 => github.com/flouthoc/container-libs/image/v5 v5.0.0-20250925194119-a9e3e4c00d13
+## explicit; go 1.23.3
 go.podman.io/image/v5/copy
 go.podman.io/image/v5/directory
 go.podman.io/image/v5/directory/explicitfilepath
@@ -586,10 +586,11 @@ go.podman.io/image/v5/transports
 go.podman.io/image/v5/transports/alltransports
 go.podman.io/image/v5/types
 go.podman.io/image/v5/version
-# go.podman.io/storage v1.60.1-0.20250916163606-92222dcd3da4
-## explicit; go 1.24.0
+# go.podman.io/storage v1.60.1-0.20250916163606-92222dcd3da4 => github.com/flouthoc/container-libs/storage v0.0.0-20250925194119-a9e3e4c00d13
+## explicit; go 1.23.3
 go.podman.io/storage
 go.podman.io/storage/drivers
+go.podman.io/storage/drivers/aufs
 go.podman.io/storage/drivers/btrfs
 go.podman.io/storage/drivers/copy
 go.podman.io/storage/drivers/overlay
@@ -619,6 +620,7 @@ go.podman.io/storage/pkg/homedir
 go.podman.io/storage/pkg/idmap
 go.podman.io/storage/pkg/idtools
 go.podman.io/storage/pkg/ioutils
+go.podman.io/storage/pkg/locker
 go.podman.io/storage/pkg/lockfile
 go.podman.io/storage/pkg/longpath
 go.podman.io/storage/pkg/loopback
@@ -826,3 +828,6 @@ tags.cncf.io/container-device-interface/pkg/parser
 # tags.cncf.io/container-device-interface/specs-go v1.0.0
 ## explicit; go 1.19
 tags.cncf.io/container-device-interface/specs-go
+# go.podman.io/common => github.com/flouthoc/container-libs/common v0.0.0-20250925194119-a9e3e4c00d13
+# go.podman.io/storage => github.com/flouthoc/container-libs/storage v0.0.0-20250925194119-a9e3e4c00d13
+# go.podman.io/image/v5 => github.com/flouthoc/container-libs/image/v5 v5.0.0-20250925194119-a9e3e4c00d13

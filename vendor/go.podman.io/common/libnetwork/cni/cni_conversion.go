@@ -355,7 +355,9 @@ func convertSpecgenPortsToCNIPorts(ports []types.PortMapping) ([]cniPortMapEntry
 		if port.Protocol == "" {
 			return nil, errors.New("port protocol should not be empty")
 		}
-		for protocol := range strings.SplitSeq(port.Protocol, ",") {
+		protocols := strings.Split(port.Protocol, ",")
+
+		for _, protocol := range protocols {
 			if !slices.Contains([]string{"tcp", "udp", "sctp"}, protocol) {
 				return nil, fmt.Errorf("unknown port protocol %s", protocol)
 			}

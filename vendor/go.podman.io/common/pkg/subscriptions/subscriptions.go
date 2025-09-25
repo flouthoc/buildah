@@ -144,12 +144,15 @@ func getMounts(filePath string) []string {
 }
 
 // getHostAndCtrDir separates the host:container paths.
-func getMountsMap(path string) (string, string) {
-	host, ctr, ok := strings.Cut(path, ":")
-	if !ok {
-		return path, path
+func getMountsMap(path string) (string, string, error) { //nolint
+	arr := strings.SplitN(path, ":", 2)
+	switch len(arr) {
+	case 1:
+		return arr[0], arr[0], nil
+	case 2:
+		return arr[0], arr[1], nil
 	}
-	return host, ctr
+	return "", "", fmt.Errorf("unable to get host and container dir from path: %s", path)
 }
 
 // Return true iff the system is in FIPS mode as determined by reading
@@ -235,7 +238,10 @@ func addSubscriptionsFromMountsFile(filePath, mountLabel, containerRunDir string
 	defaultMountsPaths := getMounts(filePath)
 	mounts := make([]rspec.Mount, 0, len(defaultMountsPaths))
 	for _, path := range defaultMountsPaths {
-		hostDirOrFile, ctrDirOrFile := getMountsMap(path)
+		hostDirOrFile, ctrDirOrFile, err := getMountsMap(path)
+		if err != nil {
+			return nil, err
+		}
 		// skip if the hostDirOrFile path doesn't exist
 		fileInfo, err := os.Stat(hostDirOrFile)
 		if err != nil {

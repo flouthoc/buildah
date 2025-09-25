@@ -89,16 +89,18 @@ func (r *Runtime) compileImageFilters(ctx context.Context, options *ListImagesOp
 		var key, value string
 		var filter filterFunc
 		negate := false
-		key, value, ok := strings.Cut(f, "!=")
-		if ok {
+		split := strings.SplitN(f, "!=", 2)
+		if len(split) == 2 {
 			negate = true
 		} else {
-			key, value, ok = strings.Cut(f, "=")
-			if !ok {
+			split = strings.SplitN(f, "=", 2)
+			if len(split) != 2 {
 				return nil, false, fmt.Errorf(filterInvalidValue, f)
 			}
 		}
 
+		key = split[0]
+		value = split[1]
 		switch key {
 		case "after", "since":
 			img, err := r.time(key, value)

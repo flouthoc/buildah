@@ -989,15 +989,15 @@ func (c *checkDirectory) add(path string, typeflag byte, uid, gid int, size int6
 
 // remove removes an item from a checkDirectory
 func (c *checkDirectory) remove(path string) {
-	parent, rest, ok := strings.Cut(path, "/")
-	if !ok {
-		delete(c.directory, parent)
-		delete(c.file, parent)
+	components := strings.Split(path, "/")
+	if len(components) == 1 {
+		delete(c.directory, components[0])
+		delete(c.file, components[0])
 		return
 	}
-	subdirectory := c.directory[parent]
+	subdirectory := c.directory[components[0]]
 	if subdirectory != nil {
-		subdirectory.remove(rest)
+		subdirectory.remove(strings.Join(components[1:], "/"))
 	}
 }
 
@@ -1019,7 +1019,7 @@ func (c *checkDirectory) header(hdr *tar.Header) {
 			// root directory of the archive, which is not always the
 			// same as being relative to hdr.Name
 			directory := c
-			for component := range strings.SplitSeq(path.Clean(hdr.Linkname), "/") {
+			for _, component := range strings.Split(path.Clean(hdr.Linkname), "/") {
 				if component == "." || component == ".." {
 					continue
 				}

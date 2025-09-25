@@ -124,10 +124,11 @@ func parseNetworkOptions(config *config.Config, extraOptions []string) (*network
 		enableIPv6:          true,
 	}
 	for _, o := range options {
-		option, value, ok := strings.Cut(o, "=")
-		if !ok {
+		parts := strings.SplitN(o, "=", 2)
+		if len(parts) < 2 {
 			return nil, fmt.Errorf("unknown option for slirp4netns: %q", o)
 		}
+		option, value := parts[0], parts[1]
 		switch option {
 		case "cidr":
 			ipv4, _, err := net.ParseCIDR(value)
@@ -638,7 +639,8 @@ func setupRootlessPortMappingViaSlirp(ports []types.PortMapping, cmd *exec.Cmd, 
 	// for each port we want to add we need to open a connection to the slirp4netns control socket
 	// and send the add_hostfwd command.
 	for _, port := range ports {
-		for protocol := range strings.SplitSeq(port.Protocol, ",") {
+		protocols := strings.Split(port.Protocol, ",")
+		for _, protocol := range protocols {
 			hostIP := port.HostIP
 			if hostIP == "" {
 				hostIP = "0.0.0.0"
