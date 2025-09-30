@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -111,7 +112,7 @@ func LookupUser(username string) (user.User, error) {
 		return usr, nil
 	}
 	// local files lookup failed; attempt to call `getent` to query configured passwd dbs
-	usr, err = getentUser(username)
+	usr, err = getentUser(fmt.Sprintf("%s %s", "passwd", username))
 	if err != nil {
 		return user.User{}, err
 	}
@@ -127,11 +128,11 @@ func LookupUID(uid int) (user.User, error) {
 		return usr, nil
 	}
 	// local files lookup failed; attempt to call `getent` to query configured passwd dbs
-	return getentUser(fmt.Sprintf("%d", uid))
+	return getentUser(fmt.Sprintf("%s %d", "passwd", uid))
 }
 
-func getentUser(key string) (user.User, error) {
-	reader, err := callGetent("passwd", key)
+func getentUser(args string) (user.User, error) {
+	reader, err := callGetent(args)
 	if err != nil {
 		return user.User{}, err
 	}
@@ -140,7 +141,7 @@ func getentUser(key string) (user.User, error) {
 		return user.User{}, err
 	}
 	if len(users) == 0 {
-		return user.User{}, fmt.Errorf("getent failed to find passwd entry for %q", key)
+		return user.User{}, fmt.Errorf("getent failed to find passwd entry for %q", strings.Split(args, " ")[1])
 	}
 	return users[0], nil
 }
@@ -154,7 +155,7 @@ func LookupGroup(groupname string) (user.Group, error) {
 		return group, nil
 	}
 	// local files lookup failed; attempt to call `getent` to query configured group dbs
-	return getentGroup(groupname)
+	return getentGroup(fmt.Sprintf("%s %s", "group", groupname))
 }
 
 // LookupGID uses traditional local system files lookup (from libcontainer/user) on a group ID,
@@ -166,11 +167,11 @@ func LookupGID(gid int) (user.Group, error) {
 		return group, nil
 	}
 	// local files lookup failed; attempt to call `getent` to query configured group dbs
-	return getentGroup(fmt.Sprintf("%d", gid))
+	return getentGroup(fmt.Sprintf("%s %d", "group", gid))
 }
 
-func getentGroup(key string) (user.Group, error) {
-	reader, err := callGetent("group", key)
+func getentGroup(args string) (user.Group, error) {
+	reader, err := callGetent(args)
 	if err != nil {
 		return user.Group{}, err
 	}
@@ -179,18 +180,18 @@ func getentGroup(key string) (user.Group, error) {
 		return user.Group{}, err
 	}
 	if len(groups) == 0 {
-		return user.Group{}, fmt.Errorf("getent failed to find groups entry for %q", key)
+		return user.Group{}, fmt.Errorf("getent failed to find groups entry for %q", strings.Split(args, " ")[1])
 	}
 	return groups[0], nil
 }
 
-func callGetent(db, key string) (io.Reader, error) {
+func callGetent(args string) (io.Reader, error) {
 	entOnce.Do(func() { getentCmd, _ = resolveBinary("getent") })
 	// if no `getent` command on host, can't do anything else
 	if getentCmd == "" {
 		return nil, fmt.Errorf("")
 	}
-	out, err := execCmd(getentCmd, db, key)
+	out, err := execCmd(getentCmd, args)
 	if err != nil {
 		exitCode, errC := system.GetExitCode(err)
 		if errC != nil {
@@ -200,7 +201,8 @@ func callGetent(db, key string) (io.Reader, error) {
 		case 1:
 			return nil, fmt.Errorf("getent reported invalid parameters/database unknown")
 		case 2:
-			return nil, fmt.Errorf("getent unable to find entry %q in %s database", key, db)
+			terms := strings.Split(args, " ")
+			return nil, fmt.Errorf("getent unable to find entry %q in %s database", terms[1], terms[0])
 		case 3:
 			return nil, fmt.Errorf("getent database doesn't support enumeration")
 		default:

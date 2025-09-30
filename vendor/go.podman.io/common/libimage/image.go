@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -174,7 +173,12 @@ func (i *Image) Digests() []digest.Digest {
 // hasDigest returns whether the specified value matches any digest of the
 // image.
 func (i *Image) hasDigest(wantedDigest digest.Digest) bool {
-	return slices.Contains(i.Digests(), wantedDigest)
+	for _, d := range i.Digests() {
+		if d == wantedDigest {
+			return true
+		}
+	}
+	return false
 }
 
 // containsDigestPrefix returns whether the specified value matches any digest of the
@@ -634,9 +638,16 @@ func (i *Image) Untag(name string) error {
 
 	name = ref.String()
 
+	foundName := false
+	for _, n := range i.Names() {
+		if n == name {
+			foundName = true
+			break
+		}
+	}
 	// Return an error if the name is not found, the c/storage
 	// RemoveNames() API does not create one if no match is found.
-	if !slices.Contains(i.Names(), name) {
+	if !foundName {
 		return fmt.Errorf("%s: %w", name, errTagUnknown)
 	}
 

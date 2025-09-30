@@ -208,14 +208,14 @@ func parseAAParserVersion(output string) (int, error) {
 	// AppArmor parser version 2.9.1
 	// Copyright (C) 1999-2008 Novell Inc.
 	// Copyright 2009-2012 Canonical Ltd.
-	firstLine, _, _ := strings.Cut(output, "\n")
-	words := strings.Split(firstLine, " ")
+	lines := strings.SplitN(output, "\n", 2)
+	words := strings.Split(lines[0], " ")
 	version := words[len(words)-1]
 
 	// trim "-beta1" suffix from version="3.0.0-beta1" if exists
-	version, _, _ = strings.Cut(version, "-")
+	version = strings.SplitN(version, "-", 2)[0]
 	// also trim "~..." suffix used historically (https://gitlab.com/apparmor/apparmor/-/commit/bca67d3d27d219d11ce8c9cc70612bd637f88c10)
-	version, _, _ = strings.Cut(version, "~")
+	version = strings.SplitN(version, "~", 2)[0]
 
 	// split by major minor version
 	v := strings.Split(version, ".")

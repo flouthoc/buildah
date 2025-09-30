@@ -3,7 +3,14 @@ package slirp4netns
 import "net"
 
 const (
-	BinaryName = "slirp4netns"
+	ipv6ConfDefaultAcceptDadSysctl = "/proc/sys/net/ipv6/conf/default/accept_dad"
+	BinaryName                     = "slirp4netns"
+
+	// defaultMTU the default MTU override.
+	defaultMTU = 65520
+
+	// default slirp4ns subnet.
+	defaultSubnet = "10.0.2.0/24"
 )
 
 // SetupResult return type from Setup().

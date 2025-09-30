@@ -38,9 +38,10 @@ func ParseUintList(val string) (map[int]bool, error) {
 	}
 
 	availableInts := make(map[int]bool)
+	split := strings.Split(val, ",")
 	errInvalidFormat := fmt.Errorf("invalid format: %s", val)
 
-	for r := range strings.SplitSeq(val, ",") {
+	for _, r := range split {
 		minS, maxS, ok := strings.Cut(r, "-")
 		if !ok {
 			v, err := strconv.Atoi(r)

@@ -32,10 +32,8 @@ func statUnix(fi os.FileInfo, hdr *tar.Header) error {
 
 	if s.Mode&unix.S_IFBLK != 0 ||
 		s.Mode&unix.S_IFCHR != 0 {
-		// _nolint_: Whether this conversion is required is hardware- and OS-dependent: the value might be uint64 on Linux, int32 on macOS.
-		// So, this might trigger either "uncovert" (if the conversion is unnecessary) or "nolintlint" (if it is required)
-		hdr.Devmajor = int64(unix.Major(uint64(s.Rdev))) //nolint:unconvert,nolintlint
-		hdr.Devminor = int64(unix.Minor(uint64(s.Rdev))) //nolint:unconvert,nolintlint
+		hdr.Devmajor = int64(unix.Major(uint64(s.Rdev))) //nolint: unconvert
+		hdr.Devminor = int64(unix.Minor(uint64(s.Rdev))) //nolint: unconvert
 	}
 
 	return nil
@@ -76,10 +74,8 @@ func setHeaderForSpecialDevice(hdr *tar.Header, name string, stat any) (err erro
 		// Currently go does not fill in the major/minors
 		if s.Mode&unix.S_IFBLK != 0 ||
 			s.Mode&unix.S_IFCHR != 0 {
-			// _nolint_: Whether this conversion is required is hardware- and OS-dependent: the value might be uint64 on Linux, int32 on macOS.
-			// So, this might trigger either "uncovert" (if the conversion is unnecessary) or "nolintlint" (if it is required)
-			hdr.Devmajor = int64(major(uint64(s.Rdev))) //nolint: unconvert,nolintlint
-			hdr.Devminor = int64(minor(uint64(s.Rdev))) //nolint: unconvert,nolintlint
+			hdr.Devmajor = int64(major(uint64(s.Rdev))) //nolint: unconvert
+			hdr.Devminor = int64(minor(uint64(s.Rdev))) //nolint: unconvert
 		}
 	}
 

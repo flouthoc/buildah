@@ -93,6 +93,7 @@ var (
 	// Slice of drivers that should be used in an order
 	Priority = []string{
 		"overlay",
+		"aufs",
 		"btrfs",
 		"zfs",
 		"vfs",

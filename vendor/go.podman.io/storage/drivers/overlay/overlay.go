@@ -501,7 +501,7 @@ func parseOptions(options []string) (*overlayOptions, error) {
 			if val == "" {
 				continue
 			}
-			for store := range strings.SplitSeq(val, ",") {
+			for _, store := range strings.Split(val, ",") {
 				store = filepath.Clean(store)
 				if !filepath.IsAbs(store) {
 					return nil, fmt.Errorf("overlay: image path %q is not absolute.  Can not be relative", store)
@@ -521,7 +521,7 @@ func parseOptions(options []string) (*overlayOptions, error) {
 			if val == "" {
 				continue
 			}
-			for lstore := range strings.SplitSeq(val, ",") {
+			for _, lstore := range strings.Split(val, ",") {
 				elems := strings.Split(lstore, ":")
 				lstore = filepath.Clean(elems[0])
 				if !filepath.IsAbs(lstore) {
@@ -1196,8 +1196,8 @@ func (d *Driver) getLower(parent string) (string, error) {
 
 	parentLower, err := os.ReadFile(path.Join(parentDir, lowerFile))
 	if err == nil {
-		parentLowers := strings.SplitSeq(string(parentLower), ":")
-		lowers = slices.AppendSeq(lowers, parentLowers)
+		parentLowers := strings.Split(string(parentLower), ":")
+		lowers = append(lowers, parentLowers...)
 	}
 	return strings.Join(lowers, ":"), nil
 }
@@ -1247,7 +1247,7 @@ func (d *Driver) getLowerDirs(id string) ([]string, error) {
 	var lowersArray []string
 	lowers, err := os.ReadFile(path.Join(d.dir(id), lowerFile))
 	if err == nil {
-		for s := range strings.SplitSeq(string(lowers), ":") {
+		for _, s := range strings.Split(string(lowers), ":") {
 			lower := d.dir(s)
 			lp, err := os.Readlink(lower)
 			// if the link does not exist, we lost the symlinks during a sudden reboot.

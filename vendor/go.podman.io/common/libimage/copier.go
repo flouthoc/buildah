@@ -9,7 +9,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"slices"
 	"strings"
 	"time"
 
@@ -397,7 +396,7 @@ func (c *Copier) copyInternal(ctx context.Context, source, destination types.Ima
 		// TimeoutStartSec=, the service manager will allow the service to continue to start, provided the
 		// service repeats "EXTEND_TIMEOUT_USEC=..."  within the interval specified until the service startup
 		// status is finished by "READY=1"."
-		extendValue := fmt.Appendf(nil, "EXTEND_TIMEOUT_USEC=%d", extension.Microseconds())
+		extendValue := []byte(fmt.Sprintf("EXTEND_TIMEOUT_USEC=%d", extension.Microseconds()))
 		extendTimeout := func() {
 			if _, err := conn.Write(extendValue); err != nil {
 				logrus.Errorf("Increasing EXTEND_TIMEOUT_USEC failed: %v", err)
@@ -556,9 +555,11 @@ func checkRegistrySourcesAllows(dest types.ImageReference) (insecure *bool, err 
 		return nil, fmt.Errorf("registry %q denied by policy: not in allowed registries list (%s)", reference.Domain(dref), registrySources)
 	}
 
-	if slices.Contains(sources.InsecureRegistries, reference.Domain(dref)) {
-		insecure := true
-		return &insecure, nil
+	for _, insecureDomain := range sources.InsecureRegistries {
+		if insecureDomain == reference.Domain(dref) {
+			insecure := true
+			return &insecure, nil
+		}
 	}
 
 	return nil, nil

@@ -1122,7 +1122,7 @@ func (s *storageImageDestination) createNewLayer(index int, trusted trustedLayer
 			}
 		}
 
-		flags := make(map[string]any)
+		flags := make(map[string]interface{})
 		if untrustedUncompressedDigest != "" {
 			flags[expectedLayerDiffIDFlag] = untrustedUncompressedDigest.String()
 			logrus.Debugf("Setting uncompressed digest to %q for layer %q", untrustedUncompressedDigest, newLayerID)
